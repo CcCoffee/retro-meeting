@@ -28,7 +28,6 @@ export default function Meeting() {
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [newFeedback, setNewFeedback] = useState({ content: '', type: 'good' })
   const [isLoading, setIsLoading] = useState(true)
-  const [user, setUser] = useState(null)
 
   useEffect(() => {
     async function fetchMeetingAndFeedbacks() {
@@ -98,10 +97,6 @@ export default function Meeting() {
 
   if (isLoading) {
     return <div>Loading...</div>
-  }
-
-  if (!user) {
-    return <div>请先登录</div>
   }
 
   if (!meeting) {
