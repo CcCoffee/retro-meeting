@@ -1,15 +1,48 @@
-import { createClient } from '@/lib/supabase'
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import Link from "next/link"
-import { redirect } from 'next/navigation'
+"use client";
 
-export default async function Home() {
-  const supabase = createClient()
-  const { data: { session } } = await supabase.auth.getSession()
+import { useEffect, useState } from 'react';
+import { createClient } from '@/lib/supabase';
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import Link from "next/link";
+import { useRouter } from 'next/navigation';
+import { Session } from '@supabase/supabase-js';
+
+export default function Home() {
+  const [session, setSession] = useState<Session | null>(null);
+  const [loading, setLoading] = useState(true);
+  const router = useRouter();
+  const supabase = createClient();
+
+  useEffect(() => {
+    async function checkSession() {
+      const { data: { session } } = await supabase.auth.getSession();
+      setSession(session as Session | null);
+      setLoading(false);
+
+      if (!session) {
+        router.push('/signin');
+      }
+    }
+
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
+      setSession(session as Session | null);
+      if (!session) {
+        router.push('/signin');
+      }
+    });
+
+    checkSession();
+
+    return () => subscription.unsubscribe();
+  }, []);
+
+  if (loading) {
+    return <div>Loading...</div>;
+  }
 
   if (!session) {
-    return redirect('/signin')
+    return null; // 或者显示一个加载指示器
   }
 
   return (
@@ -60,5 +93,5 @@ export default async function Home() {
         </Card>
       </div>
     </div>
-  )
+  );
 }
