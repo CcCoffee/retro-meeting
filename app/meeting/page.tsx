@@ -2,10 +2,10 @@
 
 import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
-import { supabase } from '@/lib/supabase'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Button } from "@/components/ui/button"
 import { Textarea } from "@/components/ui/textarea"
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 
 interface Meeting {
   id: string
@@ -20,13 +20,15 @@ interface Feedback {
   type: 'good' | 'bad' | 'action'
 }
 
-export default function MeetingPage() {
+export default function Meeting() {
+  const supabase = createClientComponentClient()
   const searchParams = useSearchParams()
   const id = searchParams.get('id')
   const [meeting, setMeeting] = useState<Meeting | null>(null)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [newFeedback, setNewFeedback] = useState({ content: '', type: 'good' })
   const [isLoading, setIsLoading] = useState(true)
+  const [user, setUser] = useState(null)
 
   useEffect(() => {
     async function fetchMeetingAndFeedbacks() {
@@ -96,6 +98,10 @@ export default function MeetingPage() {
 
   if (isLoading) {
     return <div>Loading...</div>
+  }
+
+  if (!user) {
+    return <div>请先登录</div>
   }
 
   if (!meeting) {

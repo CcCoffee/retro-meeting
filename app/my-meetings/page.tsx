@@ -1,7 +1,7 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { supabase } from '@/lib/supabase'
+import { createClientComponentClient } from '@supabase/auth-helpers-nextjs'
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
 import { Button } from "@/components/ui/button"
 import Link from 'next/link'
@@ -14,11 +14,24 @@ interface Meeting {
 }
 
 export default function MyMeetings() {
+  const supabase = createClientComponentClient()
   const [meetings, setMeetings] = useState<Meeting[]>([])
   const [isLoading, setIsLoading] = useState(true)
 
   useEffect(() => {
     async function fetchMeetings() {
+
+          // 检查当前用户
+    const { data: { user }, error: userError } = await supabase.auth.getUser();
+    if (userError) {
+      console.error("Error fetching user:", userError);
+      return;
+    }
+    if (!user) {
+      console.log("No user is currently logged in");
+      return;
+    }
+
       try {
         const { data, error } = await supabase
           .from('meetings')
