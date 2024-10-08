@@ -97,7 +97,7 @@ export default function CreateMeeting() {
         }
       }
 
-      router.push(`/meeting/${newMeeting.id}`)
+      router.push(`/meeting?id=${newMeeting.id}`)
     } catch (error) {
       logSupabaseError(error)
       // Here you would typically show an error message to the user

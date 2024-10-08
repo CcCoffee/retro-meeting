@@ -1,12 +1,13 @@
 "use client"
 
 import { useEffect, useState } from 'react'
-import { useParams } from 'next/navigation'
+import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
+import { createClient } from '@supabase/supabase-js'
 
 interface Meeting {
   id: string
@@ -22,7 +23,8 @@ interface Feedback {
 }
 
 export default function MeetingPage() {
-  const { id } = useParams()
+  const searchParams = useSearchParams()
+  const id = searchParams.get('id')
   const [meeting, setMeeting] = useState<Meeting | null>(null)
   const [feedbacks, setFeedbacks] = useState<Feedback[]>([])
   const [newFeedback, setNewFeedback] = useState({ content: '', type: 'good' })
@@ -30,6 +32,11 @@ export default function MeetingPage() {
 
   useEffect(() => {
     async function fetchMeetingAndFeedbacks() {
+      if (!id) {
+        setIsLoading(false)
+        return
+      }
+
       try {
         const { data: meetingData, error: meetingError } = await supabase
           .from('meetings')
@@ -51,15 +58,13 @@ export default function MeetingPage() {
         setFeedbacks(feedbackData || [])
       } catch (error) {
         console.error('Error fetching meeting data:', error)
-        // Here you would typically show an error message to the user
+        // 这里你通常会向用户显示一个错误消息
       } finally {
         setIsLoading(false)
       }
     }
 
-    if (id) {
-      fetchMeetingAndFeedbacks()
-    }
+    fetchMeetingAndFeedbacks()
   }, [id])
 
   async function handleSubmitFeedback() {
@@ -77,7 +82,7 @@ export default function MeetingPage() {
       setNewFeedback({ content: '', type: 'good' })
     } catch (error) {
       console.error('Error submitting feedback:', error)
-      // Here you would typically show an error message to the user
+      // 这里你通常会向用户显示一个错误消息
     }
   }
 

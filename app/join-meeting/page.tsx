@@ -39,7 +39,7 @@ export default function JoinMeeting() {
       if (error) throw error
 
       if (data) {
-        router.push(`/meeting/${data.id}`)
+        router.push(`/meeting?id=${data.id}`)
       } else {
         form.setError('meetingCode', {
           type: 'manual',
