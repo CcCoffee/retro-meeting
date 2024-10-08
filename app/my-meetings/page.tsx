@@ -61,7 +61,7 @@ export default function MyMeetings() {
               </CardContent>
               <CardFooter>
                 <Button asChild>
-                  <Link href={`/meeting/${meeting.id}`}>View Meeting</Link>
+                  <Link href={`/meeting?id=${meeting.id}`}>View Meeting</Link>
                 </Button>
               </CardFooter>
             </Card>

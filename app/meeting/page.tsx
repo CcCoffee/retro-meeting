@@ -4,10 +4,8 @@ import { useEffect, useState } from 'react'
 import { useSearchParams } from 'next/navigation'
 import { supabase } from '@/lib/supabase'
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
 import { Textarea } from "@/components/ui/textarea"
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card"
-import { createClient } from '@supabase/supabase-js'
 
 interface Meeting {
   id: string
@@ -44,7 +42,17 @@ export default function MeetingPage() {
           .eq('id', id)
           .single()
 
-        if (meetingError) throw meetingError
+        if (meetingError) {
+          console.error("Error fetching meeting:", meetingError);  // 添加错误日志
+          throw meetingError
+        }
+
+        if (!meetingData) {
+          console.warn("No meeting data found for id:", id);  // 添加警告日志
+          setMeeting(null)
+          setIsLoading(false)
+          return
+        }
 
         setMeeting(meetingData)
 
